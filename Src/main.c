@@ -47,13 +47,15 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "usbd_hid.h"
+#include "gamepad.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+Gamepad_Report_t gamepadState;
 
 /* USER CODE END PV */
 
@@ -67,7 +69,45 @@ void Error_Handler(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
+void SendTestData() {
 
+	// Hat Switch test
+	for (uint16_t i = 0; i <= 8; ++i) {
+		gamepadState.hat_switch = i;
+
+		USBD_HID_SendReport(&hUsbDeviceFS, &gamepadState,
+				sizeof(Gamepad_Report_t));
+		HAL_Delay(100);
+	}
+
+	// Buttons test
+	for (uint16_t i = 0; i < 16; ++i) {
+		gamepadState.buttons = 1 << i;
+
+		USBD_HID_SendReport(&hUsbDeviceFS, &gamepadState,
+				sizeof(Gamepad_Report_t));
+		HAL_Delay(100);
+	}
+
+	// Left test
+	for (int16_t i = -127; i <= 127; ++i) {
+		gamepadState.left_x = i;
+		gamepadState.left_y = i;
+
+		USBD_HID_SendReport(&hUsbDeviceFS, &gamepadState,
+				sizeof(Gamepad_Report_t));
+		HAL_Delay(5);
+	}
+	// right test
+	for (int16_t i = -127; i <= 127; ++i) {
+		gamepadState.right_x = i;
+		gamepadState.right_y = -i;
+
+		USBD_HID_SendReport(&hUsbDeviceFS, &gamepadState,
+				sizeof(Gamepad_Report_t));
+		HAL_Delay(5);
+	}
+}
 /* USER CODE END 0 */
 
 int main(void) {
@@ -86,20 +126,23 @@ int main(void) {
 
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
-
 	MX_USB_DEVICE_Init();
 
 	/* USER CODE BEGIN 2 */
+	gamepadState.buttons = 0;
 
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
+		HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, 1);
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-
+		SendTestData();
+		HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, 1);
+		//HAL_Delay(1000);
 	}
 	/* USER CODE END 3 */
 
@@ -170,6 +213,8 @@ void Error_Handler(void) {
 	/* USER CODE BEGIN Error_Handler */
 	/* User can add his own implementation to report the HAL error return state */
 	while (1) {
+		HAL_GPIO_TogglePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin);
+		HAL_Delay(50);
 	}
 	/* USER CODE END Error_Handler */
 }

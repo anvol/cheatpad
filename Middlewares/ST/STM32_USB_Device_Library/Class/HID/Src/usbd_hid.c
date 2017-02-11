@@ -188,7 +188,7 @@ __ALIGN_BEGIN static uint8_t USBD_HID_DeviceQualifierDesc[USB_LEN_DEV_QUALIFIER_
 
 __ALIGN_BEGIN static uint8_t HID_CUSTOM_ReportDesc[HID_CUSTOM_REPORT_DESC_SIZE] __ALIGN_END
 		= {
-		// 46 bytes
+		// 67 bytes
 				0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
 				0x09, 0x05,        // Usage (Game Pad)
 				0xA1, 0x01,        // Collection (Application)
@@ -198,9 +198,11 @@ __ALIGN_BEGIN static uint8_t HID_CUSTOM_ReportDesc[HID_CUSTOM_REPORT_DESC_SIZE] 
 				0x29, 0x10,        //    USAGE_MAXIMUM (Button 16)
 				0x15, 0x00,        //    LOGICAL_MINIMUM (0)
 				0x25, 0x01,        //    LOGICAL_MAXIMUM (1)
-				0x95, 0x10,        //    REPORT_COUNT (16)
 				0x75, 0x01,        //    REPORT_SIZE (1)
+				0x95, 0x10,        //    REPORT_COUNT (16)
 				0x81, 0x02,        //    INPUT (Data,Var,Abs)
+				0xC0,              //   End Collection
+
 				0x05, 0x01,        //    USAGE_PAGE (Generic Desktop)
 				0x09, 0x30,        //    USAGE (X)
 				0x09, 0x31,        //    USAGE (Y)
@@ -211,8 +213,18 @@ __ALIGN_BEGIN static uint8_t HID_CUSTOM_ReportDesc[HID_CUSTOM_REPORT_DESC_SIZE] 
 				0x75, 0x08,        //    REPORT_SIZE (8)
 				0x95, 0x04,        //    REPORT_COUNT (4)
 				0x81, 0x02,        //    INPUT (Data,Var,Abs)
-				0xC0,              //   End Collection
-				0xC0,              // End Collection
+
+				0x05, 0x01,        //    USAGE_PAGE (Generic Desktop)
+				0x09, 0x39,        //    hat switch
+				0x15, 0x01,        //    LOGICAL_MINIMUM (1)
+				0x25, 0x08,        //    LOGICAL_MAXIMUM (8)
+				0x35, 0x00,		   // 0
+				0x46, 0x3B, 0x01,  // 0E = 270, 3B = 315
+				0x65, 0x14,
+				0x75, 0x08,        //    REPORT_SIZE  (8)
+				0x95, 0x01,        //    REPORT_COUNT (1)
+				0x81, 0x02,        //    INPUT (Data,Var,Abs)
+			0xC0,              // End Collection
 		};
 
 /**
