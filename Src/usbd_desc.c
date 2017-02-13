@@ -121,24 +121,36 @@ USBD_DescriptorsTypeDef FS_Desc =
 /* USB Standard Device Descriptor */
 __ALIGN_BEGIN uint8_t USBD_FS_DeviceDesc[USB_LEN_DEV_DESC] __ALIGN_END =
   {
-    0x12,                       /*bLength */
-    USB_DESC_TYPE_DEVICE,       /*bDescriptorType*/
-    0x00,                       /* bcdUSB */  
-    0x02,
-    0x00,                       /*bDeviceClass*/
-    0x00,                       /*bDeviceSubClass*/
-    0x00,                       /*bDeviceProtocol*/
-    USB_MAX_EP0_SIZE,          /*bMaxPacketSize*/
-    LOBYTE(USBD_VID),           /*idVendor*/
-    HIBYTE(USBD_VID),           /*idVendor*/
-    LOBYTE(USBD_PID_FS),           /*idVendor*/
-    HIBYTE(USBD_PID_FS),           /*idVendor*/
-    0x00,                       /*bcdDevice rel. 2.00*/
-    0x02,
-    USBD_IDX_MFC_STR,           /*Index of manufacturer  string*/
-    USBD_IDX_PRODUCT_STR,       /*Index of product string*/
-    USBD_IDX_SERIAL_STR,        /*Index of serial number string*/
-    USBD_MAX_NUM_CONFIGURATION  /*bNumConfigurations*/
+	        18,                                     // bLength
+	        1,                                      // bDescriptorType
+	        0x00, 0x02,                             // bcdUSB
+	#ifdef DEVICE_CLASS
+	        DEVICE_CLASS,                           // bDeviceClass
+	#else
+		0,
+	#endif
+	#ifdef DEVICE_SUBCLASS
+	        DEVICE_SUBCLASS,                        // bDeviceSubClass
+	#else
+		0,
+	#endif
+	#ifdef DEVICE_PROTOCOL
+	        DEVICE_PROTOCOL,                        // bDeviceProtocol
+	#else
+		0,
+	#endif
+		    USB_MAX_EP0_SIZE,                               // bMaxPacketSize0
+			LOBYTE(VENDOR_ID), HIBYTE(VENDOR_ID),         // idVendor
+			LOBYTE(PRODUCT_ID), HIBYTE(PRODUCT_ID),       // idProduct
+	#ifdef DEVICE_VERSION							// bcdDevice
+			LOBYTE(DEVICE_VERSION), HIBYTE(DEVICE_VERSION),
+	#else
+	        0x00, 0x01,
+	#endif
+	        1,                                      // iManufacturer
+	        2,                                      // iProduct
+	        3,                                      // iSerialNumber
+	        1                                       // bNumConfigurations
   } ; 
 /* USB_DeviceDescriptor */
 

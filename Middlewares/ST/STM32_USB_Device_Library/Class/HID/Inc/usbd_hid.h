@@ -52,9 +52,9 @@
 #define HID_EPIN_ADDR                 0x81
 #define HID_EPIN_SIZE                 0x04
 
-#define USB_HID_CONFIG_DESC_SIZ       34
+#define USB_HID_CONFIG_DESC_SIZ       144
 #define USB_HID_DESC_SIZ              9
-#define HID_CUSTOM_REPORT_DESC_SIZE	  67
+#define HID_CUSTOM_REPORT_DESC_SIZE	  1
 
 #define HID_DESCRIPTOR_TYPE           0x21
 #define HID_REPORT_DESC               0x22
@@ -71,6 +71,7 @@
 
 #define HID_REQ_SET_REPORT            0x09
 #define HID_REQ_GET_REPORT            0x01
+
 /**
   * @}
   */ 

@@ -55,7 +55,7 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-Gamepad_Report_t gamepadState;
+extern Gamepad_Report_t gamepadState;
 
 /* USER CODE END PV */
 
@@ -69,11 +69,64 @@ void Error_Handler(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
+#define BTN_DELAY 400
+void StartTraining() {
+	for (int i = 1; i <= 5; i++) {
+		PushButton(PAD_B, 50);
+		HAL_Delay(BTN_DELAY);
+	}
+
+	for (int i = 1; i <= 1; i++) {
+		PushButton(PAD_A, 50);
+		HAL_Delay(BTN_DELAY);
+	}
+
+	for (int i = 1; i <= 4; i++) {
+		PushButton(PAD_DOWN, 50);
+		HAL_Delay(BTN_DELAY);
+	}
+
+	for (int i = 1; i <= 2; i++) {
+		PushButton(PAD_A, 50);
+		HAL_Delay(BTN_DELAY);
+	}
+
+	HAL_Delay(2000); // wait till load
+	PushButton(PAD_DOWN, 50);
+	HAL_Delay(BTN_DELAY);
+
+	PushButton(PAD_X, 50);
+	HAL_Delay(BTN_DELAY);
+
+	for (int i = 1; i <= 4; i++) {
+		PushButton(PAD_DOWN, 50);
+		HAL_Delay(BTN_DELAY);
+	}
+
+	PushButton(PAD_A, 50);
+	HAL_Delay(BTN_DELAY);
+
+	PushButton(PAD_RIGHT, 50);
+	HAL_Delay(BTN_DELAY);
+
+	for (int i = 1; i <= 4; i++) {
+		PushButton(PAD_A, 50);
+		HAL_Delay(BTN_DELAY);
+	}
+}
+
+void ReturnToTrain(){
+	for (int i = 1; i <= 5; i++) {
+		PushButton(PAD_B, 60);
+		HAL_Delay(100);
+	}
+}
+
 void SendTestData() {
 
 	// Hat Switch test
 	for (uint16_t i = 0; i <= 8; ++i) {
-		gamepadState.hat_switch = i;
+		gamepadState.bButtonPacket1 = i;
 
 		USBD_HID_SendReport(&hUsbDeviceFS, &gamepadState,
 				sizeof(Gamepad_Report_t));
@@ -82,7 +135,8 @@ void SendTestData() {
 
 	// Buttons test
 	for (uint16_t i = 0; i < 16; ++i) {
-		gamepadState.buttons = 1 << i;
+		gamepadState.bButtonPacket1 = 1 << i;
+		gamepadState.bButtonPacket2 = 1 << i;
 
 		USBD_HID_SendReport(&hUsbDeviceFS, &gamepadState,
 				sizeof(Gamepad_Report_t));
@@ -96,16 +150,16 @@ void SendTestData() {
 
 		USBD_HID_SendReport(&hUsbDeviceFS, &gamepadState,
 				sizeof(Gamepad_Report_t));
-		HAL_Delay(5);
+		HAL_Delay(10);
 	}
 	// right test
 	for (int16_t i = -127; i <= 127; ++i) {
-		gamepadState.right_x = i;
-		gamepadState.right_y = -i;
+		gamepadState.left_trigger = i;
+		gamepadState.right_trigger = -i;
 
 		USBD_HID_SendReport(&hUsbDeviceFS, &gamepadState,
 				sizeof(Gamepad_Report_t));
-		HAL_Delay(5);
+		HAL_Delay(10);
 	}
 }
 /* USER CODE END 0 */
@@ -129,20 +183,27 @@ int main(void) {
 	MX_USB_DEVICE_Init();
 
 	/* USER CODE BEGIN 2 */
-	gamepadState.buttons = 0;
+	// Enter training.
+//	HAL_Delay(5000);
 
+//	PushButton(PAD_START, 60);
+//	ReturnToTrain();
+//	StartTraining();
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-		HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, 1);
+		HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, 0);
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-		SendTestData();
+
+        PushButton(PAD_A, 500);
+		PushButton(PAD_RIGHT, 500);
+//		PushButton(PAD_Y, 70);
+		//SendTestData();
 		HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, 1);
-		//HAL_Delay(1000);
 	}
 	/* USER CODE END 3 */
 

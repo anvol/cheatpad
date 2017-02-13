@@ -121,50 +121,129 @@ NULL, USBD_HID_GetCfgDesc, USBD_HID_GetCfgDesc, USBD_HID_GetCfgDesc,
 		USBD_HID_GetDeviceQualifierDesc, };
 
 /* USB HID device Configuration Descriptor */
-__ALIGN_BEGIN static uint8_t USBD_HID_CfgDesc[USB_HID_CONFIG_DESC_SIZ] __ALIGN_END
-		= { 0x09, /* bLength: Configuration Descriptor size */
-		USB_DESC_TYPE_CONFIGURATION, /* bDescriptorType: Configuration */
-		USB_HID_CONFIG_DESC_SIZ,
-		/* wTotalLength: Bytes returned */
-		0x00, 0x01, /*bNumInterfaces: 1 interface*/
-		0x01, /*bConfigurationValue: Configuration value*/
-		0x00, /*iConfiguration: Index of string descriptor describing
-		 the configuration*/
-		0xE0, /*bmAttributes: bus powered and Support Remote Wake-up */
-		0x32, /*MaxPower 100 mA: this current is used for detecting Vbus*/
+__ALIGN_BEGIN static uint8_t USBD_HID_CfgDesc[CONFIG_DESC_SIZE] __ALIGN_END
+		= {
+				 // configuration descriptor, USB spec 9.6.3, page 264-266, Table 9-10
+				        9,                                      // bLength;
+				        2,                                      // bDescriptorType;
+				        LOBYTE(CONFIG_DESC_SIZE),                 // wTotalLength
+				        HIBYTE(CONFIG_DESC_SIZE),
+				        NUM_INTERFACE,                          // bNumInterfaces
+				        1,                                      // bConfigurationValue
+				        0,                                      // iConfiguration
+				#ifdef DEVICE_ATTRIBUTES
+						DEVICE_ATTRIBUTES,						// bmAttributes
+				#else
+				        0xC0,
+				#endif
+				#ifdef DEVICE_POWER
+						DEVICE_POWER,							// bMaxPower
+				#else
+				        50,
+				#endif
 
-		/************** Descriptor of Joystick Mouse interface ****************/
-		/* 09 */
-		0x09, /*bLength: Interface Descriptor size*/
-		USB_DESC_TYPE_INTERFACE,/*bDescriptorType: Interface descriptor type*/
-		0x00, /*bInterfaceNumber: Number of Interface*/
-		0x00, /*bAlternateSetting: Alternate setting*/
-		0x01, /*bNumEndpoints*/
-		0x03, /*bInterfaceClass: HID*/
-		0x00, /*bInterfaceSubClass : 1=BOOT, 0=no boot*/
-		0x01, /*nInterfaceProtocol : 0=none, 1=keyboard, 2=mouse*/
-		0, /*iInterface: Index of string descriptor*/
-		/******************** Descriptor of Joystick Mouse HID ********************/
-		/* 18 */
-		0x09, /*bLength: HID Descriptor size*/
-		HID_DESCRIPTOR_TYPE, /*bDescriptorType: HID*/
-		0x11, /*bcdHID: HID Class Spec release number*/
-		0x01, 0x00, /*bCountryCode: Hardware target country*/
-		0x01, /*bNumDescriptors: Number of HID class descriptors to follow*/
-		0x22, /*bDescriptorType*/
-		HID_CUSTOM_REPORT_DESC_SIZE,/*wItemLength: Total length of Report descriptor*/
-		0x00,
-		/******************** Descriptor of Mouse endpoint ********************/
-		/* 27 */
-		0x07, /*bLength: Endpoint Descriptor size*/
-		USB_DESC_TYPE_ENDPOINT, /*bDescriptorType:*/
+				#ifdef XINPUT_INTERFACE
+				//Interface 0
+					9,				//bLength (length of interface descriptor 9 bytes)
+					4,				//bDescriptorType (4 is interface)
+					0,				//bInterfaceNumber (This is interface 0)
+					0,				//bAlternateSetting (used to select alternate setting.  notused)
+					2,				//bNumEndpoints (this interface has 2 endpoints)
+					0xFF,			//bInterfaceClass (Vendor Defined is 255)
+					0x5D,			//bInterfaceSubClass
+					0x01,			//bInterfaceProtocol
+					0,				//iInterface (Index of string descriptor for describing this notused)
+					//Some sort of common descriptor? I pulled this from Message Analyzer dumps of an actual controller
+					17,33,0,1,1,37,129,20,0,0,0,0,19,2,8,0,0,
+					//Endpoint 1 IN
+					7,				//bLength (length of ep1in in descriptor 7 bytes)
+					5,				//bDescriptorType (5 is endpoint)
+					0x81,			//bEndpointAddress (0x81 is IN1)
+					0x03,			//bmAttributes (0x03 is interrupt no synch, usage type data)
+					0x20, 0x00,		//wMaxPacketSize (0x0020 is 1x32 bytes)
+					4,				//bInterval (polling interval in frames 4 frames)
+					//Endpoint 2 OUT
+					7,				//bLength (length of ep2out in descriptor 7 bytes)
+					5,				//bDescriptorType (5 is endpoint)
+					0x02,			//bEndpointAddress (0x02 is OUT2)
+					0x03,			//bmAttributes (0x03 is interrupt no synch, usage type data)
+					0x20, 0x00,		//wMaxPacketSize (0x0020 is 1x32 bytes)
+					8,				//bInterval (polling interval in frames 8 frames)
+				//Interface 1
+					9,				//bLength (length of interface descriptor 9 bytes)
+					4,				//bDescriptorType (4 is interface)
+					1,				//bInterfaceNumber (This is interface 1)
+					0,				//bAlternateSetting (used to select alternate setting.  notused)
+					4,				//bNumEndpoints (this interface has 4 endpoints)
+					0xFF,			//bInterfaceClass (Vendor Defined is 255)
+					0x5D,			//bInterfaceSubClass (93)
+					0x03,			//bInterfaceProtocol (3)
+					0,				//iInterface (Index of string descriptor for describing this notused)
+					//A different common descriptor? I pulled this from Message Analyzer dumps of an actual controller
+					27,33,0,1,1,1,131,64,1,4,32,22,133,0,0,0,0,0,0,22,5,0,0,0,0,0,0,
+					//Endpoint 3 IN
+					7,				//bLength (length of ep3in descriptor 7 bytes)
+					5,				//bDescriptorType (5 is endpoint)
+					0x83,			//bEndpointAddress (0x83 is IN3)
+					0x03,			//bmAttributes (0x03 is interrupt no synch, usage type data)
+					0x20, 0x00,		//wMaxPacketSize (0x0020 is 1x32 bytes)
+					2,				//bInterval (polling interval in frames 2 frames)
+					//Endpoint 4 OUT
+					7,				//bLength (length of ep4out descriptor 7 bytes)
+					5,				//bDescriptorType (5 is endpoint)
+					0x04,			//bEndpointAddress (0x04 is OUT4)
+					0x03,			//bmAttributes (0x03 is interrupt no synch, usage type data)
+					0x20, 0x00,		//wMaxPacketSize (0x0020 is 1x32 bytes)
+					4,				//bInterval (polling interval in frames 4 frames)
+					//Endpoint 5 IN
+					7,				//bLength (length of ep5in descriptor 7 bytes)
+					5,				//bDescriptorType (5 is endpoint)
+					0x85,			//bEndpointAddress (0x85 is IN5)
+					0x03,			//bmAttributes (0x03 is interrupt no synch, usage type data)
+					0x20, 0x00,		//wMaxPacketSize (0x0020 is 1x32 bytes)
+					64,				//bInterval (polling interval in frames 64 frames)
+					//Endpoint 5 OUT (shares endpoint number with previous)
+					7,				//bLength (length of ep5out descriptor 7 bytes)
+					5,				//bDescriptorType (5 is endpoint)
+					0x05,			//bEndpointAddress (0x05 is OUT5)
+					0x03,			//bmAttributes (0x03 is interrupt no synch, usage type data)
+					0x20, 0x00,		//wMaxPacketSize (0x0020 is 1x32 bytes)
+					16,				//bInterval (polling interval in frames 16 frames)
+				//Interface 2
+					9,				//bLength (length of interface descriptor 9 bytes)
+					4,				//bDescriptorType (4 is interface)
+					2,				//bInterfaceNumber (This is interface 2)
+					0,				//bAlternateSetting (used to select alternate setting.  notused)
+					1,				//bNumEndpoints (this interface has 4 endpoints)
+					0xFF,			//bInterfaceClass (Vendor Defined is 255)
+					0x5D,			//bInterfaceSubClass (93)
+					0x02,			//bInterfaceProtocol (3)
+					0,				//iInterface (Index of string descriptor for describing this notused)
+					//Common Descriptor.  Seems that these come after every interface description?
+					9,33,0,1,1,34,134,7,0,
+					//Endpoint 6 IN
+					7,				//bLength (length of ep6in descriptor 7 bytes)
+					5,				//bDescriptorType (5 is endpoint)
+					0x86,			//bEndpointAddress (0x86 is IN6)
+					0x03,			//bmAttributes (0x03 is interrupt no synch, usage type data)
+					0x20, 0x00,		//wMaxPacketSize (0x0020 is 1x32 bytes)
+					16,				//bInterval (polling interval in frames 64 frames)+
+				//Interface 3
+				//This is the interface on which all the security handshaking takes place
+				//We don't use this but it could be used for man-in-the-middle stuff
+					9,				//bLength (length of interface descriptor 9 bytes)
+					4,				//bDescriptorType (4 is interface)
+					3,				//bInterfaceNumber (This is interface 3)
+					0,				//bAlternateSetting (used to select alternate setting.  notused)
+					0,				//bNumEndpoints (this interface has 0 endpoints ???)
+					0xFF,			//bInterfaceClass (Vendor Defined is 255)
+					0xFD,			//bInterfaceSubClass (253)
+					0x13,			//bInterfaceProtocol (19)
+					4,				//iInterface (Computer never asks for this, but an x360 would. so include one day?)
+					//Another interface another Common Descriptor
+					6,65,0,1,1,3
+				#endif // XINPUT_INTERFACE
 
-		HID_EPIN_ADDR, /*bEndpointAddress: Endpoint Address (IN)*/
-		0x03, /*bmAttributes: Interrupt endpoint*/
-		HID_EPIN_SIZE, /*wMaxPacketSize: 4 Byte max */
-		0x00,
-		HID_FS_BINTERVAL, /*bInterval: Polling Interval (10 ms)*/
-		/* 34 */
 		};
 
 /* USB HID device Configuration Descriptor */
@@ -188,42 +267,7 @@ __ALIGN_BEGIN static uint8_t USBD_HID_DeviceQualifierDesc[USB_LEN_DEV_QUALIFIER_
 
 __ALIGN_BEGIN static uint8_t HID_CUSTOM_ReportDesc[HID_CUSTOM_REPORT_DESC_SIZE] __ALIGN_END
 		= {
-		// 67 bytes
-				0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
-				0x09, 0x05,        // Usage (Game Pad)
-				0xA1, 0x01,        // Collection (Application)
-				0xA1, 0x00,        // 	Collection (Physical)
-				0x05, 0x09,        // 	 USAGE_PAGE (Button)
-				0x19, 0x01,        // 	 USAGE_MINIMUM (Button 1)
-				0x29, 0x10,        //    USAGE_MAXIMUM (Button 16)
-				0x15, 0x00,        //    LOGICAL_MINIMUM (0)
-				0x25, 0x01,        //    LOGICAL_MAXIMUM (1)
-				0x75, 0x01,        //    REPORT_SIZE (1)
-				0x95, 0x10,        //    REPORT_COUNT (16)
-				0x81, 0x02,        //    INPUT (Data,Var,Abs)
-				0xC0,              //   End Collection
-
-				0x05, 0x01,        //    USAGE_PAGE (Generic Desktop)
-				0x09, 0x30,        //    USAGE (X)
-				0x09, 0x31,        //    USAGE (Y)
-				0x09, 0x32,        //    USAGE (Z)
-				0x09, 0x33,        //    USAGE (Rx)
-				0x15, 0x81,        //    LOGICAL_MINIMUM (-127)
-				0x25, 0x7F,        //    LOGICAL_MAXIMUM (127)
-				0x75, 0x08,        //    REPORT_SIZE (8)
-				0x95, 0x04,        //    REPORT_COUNT (4)
-				0x81, 0x02,        //    INPUT (Data,Var,Abs)
-
-				0x05, 0x01,        //    USAGE_PAGE (Generic Desktop)
-				0x09, 0x39,        //    hat switch
-				0x15, 0x01,        //    LOGICAL_MINIMUM (1)
-				0x25, 0x08,        //    LOGICAL_MAXIMUM (8)
-				0x35, 0x00,		   // 0
-				0x46, 0x3B, 0x01,  // 0E = 270, 3B = 315
-				0x65, 0x14,
-				0x75, 0x08,        //    REPORT_SIZE  (8)
-				0x95, 0x01,        //    REPORT_COUNT (1)
-				0x81, 0x02,        //    INPUT (Data,Var,Abs)
+		// 75 bytes
 			0xC0,              // End Collection
 		};
 
