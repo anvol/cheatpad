@@ -190,12 +190,13 @@ int main(void)
 //	PushButton(PAD_START, 60);
 //	ReturnToTrain();
 //	StartTraining();
+  	HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	while (1) {
-		HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, 0);
+	//	HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, 0);
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
@@ -203,7 +204,7 @@ int main(void)
 //		PushButton(PAD_RIGHT, 500);
 //		PushButton(PAD_Y, 70);
 //      SendTestData();
-		HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, 1);
+	//	HAL_GPIO_WritePin(BLUE_LED_GPIO_Port, BLUE_LED_Pin, 1);
 		HAL_Delay(500);
 	}
   /* USER CODE END 3 */
