@@ -1,7 +1,7 @@
 /*
  * gamepad.h
  *
- *  Created on: 10 лют. 2017 р.
+ *  Created on: 10 пїЅпїЅпїЅ. 2017 пїЅ.
  *      Author: volos
  */
 
@@ -12,17 +12,17 @@
 
 typedef struct
 	__packed {
-		int8_t msgType;
-		int8_t bSize;
-		int8_t bButtonPacket1;
-		int8_t bButtonPacket2;
-		int8_t left_trigger;
-		int8_t right_trigger;
+		uint8_t msgType;
+		uint8_t bSize;
+		uint8_t bButtonPacket1;
+		uint8_t bButtonPacket2;
+		uint8_t left_trigger;
+		uint8_t right_trigger;
 		int16_t left_x;
 		int16_t left_y;
 		int16_t right_x;
 		int16_t right_y;
-		int8_t reserved[6];
+		uint8_t reserved[6];
 
 	} Gamepad_Report_t;
 
@@ -63,6 +63,7 @@ typedef struct
 		case PAD_LB:
 			gamepadState.bButtonPacket2 = 0x01;
 			break;
+
 		case PAD_RB:
 			gamepadState.bButtonPacket2 = 0x02;
 			break;
@@ -70,6 +71,7 @@ typedef struct
 		case PAD_LT:
 			gamepadState.left_trigger = 127;
 			break;
+
 		case PAD_RT:
 			gamepadState.right_trigger = -127;
 			break;
@@ -86,19 +88,28 @@ typedef struct
 		case PAD_RIGHT:
 			gamepadState.bButtonPacket1 = 0x08;
 			break;
+
+		case PAD_START:
+			gamepadState.bButtonPacket1 = 0x08;
+			break;
+		case PAD_SELECT:
+			gamepadState.bButtonPacket1 = 0x08;
+			break;
 		}
 
-//		USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *)&gamepadState,
-//				sizeof(Gamepad_Report_t));
+		USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *) &gamepadState,
+				sizeof(Gamepad_Report_t));
 
-//		gamepadState.bButtonPacket2 = 0;
-//		gamepadState.bButtonPacket1 = 0;
-//		gamepadState.left_trigger = 0;
-//		gamepadState.right_trigger = 0;
-//		gamepadState.left_y = 0;
-//		gamepadState.left_x = 0;
+		HAL_Delay(time_press_ms);
 
-		USBD_HID_SendReport(&hUsbDeviceFS, &gamepadState,
+		gamepadState.bButtonPacket2 = 0;
+		gamepadState.bButtonPacket1 = 0;
+		gamepadState.left_trigger = 0;
+		gamepadState.right_trigger = 0;
+		gamepadState.left_y = 0;
+		gamepadState.left_x = 0;
+
+		USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t *) &gamepadState,
 				sizeof(Gamepad_Report_t));
 	}
 
